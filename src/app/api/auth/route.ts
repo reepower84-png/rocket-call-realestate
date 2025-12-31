@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD && process.env.ADMIN_PASSWORD.trim() !== ''
-  ? process.env.ADMIN_PASSWORD
-  : 'admin1234';
+// 임시 하드코딩 - 환경 변수 문제 해결 후 원복 필요
+const ADMIN_PASSWORD = 'admin1234';
 const AUTH_COOKIE_NAME = 'admin_auth';
 const AUTH_TOKEN = 'rocket-call-admin-authenticated';
 

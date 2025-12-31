@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin1234';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? 'admin1234';
 const AUTH_COOKIE_NAME = 'admin_auth';
 const AUTH_TOKEN = 'rocket-call-admin-authenticated';
 

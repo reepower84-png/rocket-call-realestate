@@ -532,12 +532,26 @@ export default function Home() {
               무료 상담 신청
             </button>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-sm">
-            <p className="mb-2">상호: 제이코리아 | 대표: 이주영</p>
-            <p className="mb-4">사업자등록번호: 278-30-01540</p>
-            <p className="text-gray-500">
-              © 2024 로켓콜-분양. All rights reserved.
-            </p>
+          <div className="border-t border-gray-800 pt-8 text-sm flex flex-col md:flex-row justify-between gap-8">
+            <div>
+              <p className="mb-2">상호: 제이코리아 | 대표: 이주영</p>
+              <p className="mb-4">사업자등록번호: 278-30-01540</p>
+              <p className="text-gray-500">
+                © 2024 로켓콜-분양. All rights reserved.
+              </p>
+            </div>
+            <div>
+              <p className="text-white font-bold mb-3">계열사</p>
+              <ul className="space-y-1.5">
+                <li><a href="https://rk-intro.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜 인트로</a></li>
+                <li><a href="https://rocket-call.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_보험설계사</a></li>
+                <li><a href="https://rocket-call-auto-dealer.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_자동차딜러</a></li>
+                <li><a href="https://rocket-call-hospital.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_병원</a></li>
+                <li><a href="https://rocket-call-franchise.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_프랜차이즈 가맹</a></li>
+                <li><a href="https://rk-policy.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_정책자금</a></li>
+                <li><a href="https://rk-lawyer.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">로켓콜_변호사</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </footer>

@@ -510,6 +510,15 @@ export default function Home() {
               {isSubmitting ? "신청 중..." : "무료 상담 신청하기"}
             </button>
 
+            <a
+              href="http://pf.kakao.com/_zxfugn/chat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg text-center mt-3"
+            >
+              카카오톡으로 상담하기
+            </a>
+
             <p className="text-gray-500 text-xs text-center mt-4">
               입력하신 정보는 상담 목적으로만 사용되며, 개인정보 보호정책에 따라 안전하게 관리됩니다.
             </p>

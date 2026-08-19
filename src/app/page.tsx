@@ -1,6 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const NAV_ITEMS = [
+  { id: "about-section", label: "고민" },
+  { id: "solution-section", label: "솔루션" },
+  { id: "features-section", label: "강점" },
+  { id: "process-section", label: "이용절차" },
+  { id: "recording-section", label: "녹취콜" },
+  { id: "testimonials-section", label: "고객후기" },
+  { id: "products-section", label: "상품안내" },
+];
+
+// 상담 신청 폼은 메뉴에 없지만, 폼에 도달하면 상품안내 하이라이트가 남지 않도록 함께 추적
+const SCROLL_SPY_IDS = [...NAV_ITEMS.map((item) => item.id), "contact-form"];
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -13,18 +26,41 @@ export default function Home() {
     success: boolean;
     message: string;
   } | null>(null);
+  const [activeSection, setActiveSection] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // 헤더 아래를 지난 섹션 중 가장 마지막 섹션을 활성화
+      let current = "";
+      for (const id of SCROLL_SPY_IDS) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          current = id;
+        }
+      }
+      setActiveSection(current);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToForm = () => {
+    setIsMenuOpen(false);
     document.getElementById("contact-form")?.scrollIntoView({
       behavior: "smooth",
     });
   };
 
   const scrollToTop = () => {
+    setIsMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const scrollToSection = (sectionId: string) => {
+    setIsMenuOpen(false);
     document.getElementById(sectionId)?.scrollIntoView({
       behavior: "smooth",
     });
@@ -63,32 +99,100 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center gap-2">
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
           >
             <span className="text-2xl">🏢</span>
             <span className="text-xl font-bold text-emerald-600">로켓콜</span>
             <span className="text-sm text-gray-500 hidden sm:inline">| 분양 전문</span>
           </button>
-          <div className="flex items-center gap-3">
+
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`relative px-3 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+                  activeSection === item.id
+                    ? "text-emerald-600 bg-emerald-50"
+                    : "text-gray-600 hover:text-emerald-600 hover:bg-gray-50"
+                }`}
+              >
+                {item.label}
+                <span
+                  className={`absolute left-1/2 -translate-x-1/2 bottom-0 h-0.5 bg-emerald-500 rounded-full transition-all duration-300 ${
+                    activeSection === item.id ? "w-5" : "w-0"
+                  }`}
+                />
+              </button>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2 shrink-0">
             <a
               href="https://drive.google.com/file/d/1FGpJjks9asLnWIAS6wd7be0ARZDssLNM/view?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-full font-medium transition-all duration-300"
+              className="hidden xl:inline-block bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300"
             >
               제안서 보기
             </a>
             <button
               onClick={scrollToForm}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-full font-medium transition-all duration-300 hover:shadow-lg"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg whitespace-nowrap"
             >
               무료 상담 신청
             </button>
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="메뉴 열기"
+              aria-expanded={isMenuOpen}
+              className="lg:hidden p-2 -mr-1 text-gray-700 hover:text-emerald-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <nav className="lg:hidden border-t border-gray-100 bg-white shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col">
+              {NAV_ITEMS.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`text-left px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                    activeSection === item.id
+                      ? "text-emerald-600 bg-emerald-50 border-l-4 border-emerald-500"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+              <a
+                href="https://drive.google.com/file/d/1FGpJjks9asLnWIAS6wd7be0ARZDssLNM/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMenuOpen(false)}
+                className="mt-2 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl font-medium transition-all duration-200"
+              >
+                제안서 보기
+              </a>
+            </div>
+          </nav>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -144,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* Problem Section */}
-      <section id="about-section" className="py-20 px-4 bg-gray-50">
+      <section id="about-section" className="py-20 px-4 bg-gray-50 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -179,7 +283,7 @@ export default function Home() {
       </section>
 
       {/* Solution Section */}
-      <section className="py-20 px-4">
+      <section id="solution-section" className="py-20 px-4 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -224,7 +328,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-gray-50">
+      <section id="features-section" className="py-20 px-4 bg-gray-50 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -278,7 +382,7 @@ export default function Home() {
       </section>
 
       {/* Process Section */}
-      <section className="py-20 px-4">
+      <section id="process-section" className="py-20 px-4 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -312,8 +416,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Recording Section */}
+      <section id="recording-section" className="py-20 px-4 bg-gray-50 scroll-mt-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-block bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+              🎧 실제 상담 녹취
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              녹취콜 <span className="text-emerald-600">직접 들어보세요</span>
+            </h2>
+            <p className="text-gray-600 text-lg break-keep">
+              로켓콜 TM 팀이 고객과 실제로 나눈 상담 통화입니다
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { file: "/recording-1.wav", title: "녹취콜 1", desc: "구매 의향 확인 및 방문 약속 상담" },
+              { file: "/recording-2.wav", title: "녹취콜 2", desc: "관심 지역·예산 확인 후 현장 안내" },
+            ].map((rec) => (
+              <div key={rec.file} className="bg-white rounded-2xl p-6 card-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-emerald-500 text-white w-11 h-11 rounded-full flex items-center justify-center text-xl shrink-0">
+                    🎙️
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900">{rec.title}</h3>
+                    <p className="text-gray-500 text-sm">{rec.desc}</p>
+                  </div>
+                </div>
+                <audio controls preload="metadata" className="w-full">
+                  <source src={rec.file} type="audio/wav" />
+                  브라우저가 오디오 재생을 지원하지 않습니다.
+                </audio>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <div className="bg-white border border-emerald-100 rounded-2xl px-6 py-8 md:px-10 text-center card-shadow">
+              <p className="text-lg md:text-xl font-bold text-gray-900 leading-relaxed break-keep">
+                콜을 잘 돌려서 좋은 샘플콜을 올려드리는 게 아닙니다.
+              </p>
+              <p className="mt-2 text-lg md:text-xl font-bold text-gray-900 leading-relaxed break-keep">
+                <span className="text-emerald-600">
+                  오토콜을 통해 일반전화보다 최대 8배 많은 잠재고객
+                </span>
+                을 끊임없이 만들어냅니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-gray-50">
+      <section id="testimonials-section" className="py-20 px-4 bg-white scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -390,7 +548,7 @@ export default function Home() {
       </section>
 
       {/* Products Section */}
-      <section className="py-20 px-4">
+      <section id="products-section" className="py-20 px-4 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -446,7 +604,7 @@ export default function Home() {
       </section>
 
       {/* Contact Form Section */}
-      <section id="contact-form" className="py-20 px-4 bg-gray-50">
+      <section id="contact-form" className="py-20 px-4 bg-gray-50 scroll-mt-16">
         <div className="max-w-xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
